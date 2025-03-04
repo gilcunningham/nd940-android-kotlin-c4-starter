@@ -2,7 +2,13 @@ package com.udacity.project4.locationreminders.savereminder.selectreminderlocati
 
 import android.os.Bundle
 import android.view.*
-import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.udacity.project4.R
 import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.databinding.FragmentSelectLocationBinding
@@ -10,33 +16,45 @@ import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import org.koin.android.ext.android.inject
 
+
 class SelectLocationFragment : BaseFragment() {
 
     // Use Koin to get the view model of the SaveReminder
     override val _viewModel: SaveReminderViewModel by inject()
     private lateinit var binding: FragmentSelectLocationBinding
 
+    private val selectLocationViewModel : SelectLocationViewModel by viewModels()
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View {
-        val layoutId = R.layout.fragment_select_location
-        binding = DataBindingUtil.inflate(inflater, layoutId, container, false)
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ) = FragmentSelectLocationBinding.inflate(inflater, container, false).apply {
+        viewModel = _viewModel
+        lifecycleOwner = this@SelectLocationFragment.viewLifecycleOwner
+    }.root
 
-        binding.viewModel = _viewModel
-        binding.lifecycleOwner = this
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
         setDisplayHomeAsUpEnabled(true)
-
         // TODO: add the map setup implementation
+        setupMap()
+
         // TODO: zoom to the user location after taking his permission
         // TODO: add style to the map
         // TODO: put a marker to location that the user selected
 
         // TODO: call this function after the user confirms on the selected location
-        onLocationSelected()
-        return binding.root
+        //onLocationSelected()
     }
+
+    // Get a handle to the fragment and register the callback.
+    private fun setupMap() {
+        mapFragment.getMapAsync(selectLocationViewModel)
+    }
+
+    private val mapFragment : SupportMapFragment
+        get() = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
 
     private fun onLocationSelected() {
         // TODO: When the user confirms on the selected location,
@@ -64,4 +82,6 @@ class SelectLocationFragment : BaseFragment() {
         }
         else -> super.onOptionsItemSelected(item)
     }
+
+
 }
