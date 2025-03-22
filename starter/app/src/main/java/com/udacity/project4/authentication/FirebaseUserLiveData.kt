@@ -37,9 +37,7 @@ class FirebaseUserLiveData : LiveData<FirebaseUser?>() {
         // Use the FirebaseAuth instance instantiated at the beginning of the class to get an entry
         // point into the Firebase Authentication SDK the app is using.
         // With an instance of the FirebaseAuth class, you can now query for the current user.
-        println("*** authStateListener - $value")
         value = firebaseAuth.currentUser
-        println("*** DONE authStateListener")
     }
 
     // When this object has an active observer, start observing the FirebaseAuth state to see if
