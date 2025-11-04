@@ -1,0 +1,11 @@
+.idea/.gitignore
+.idea/misc.xml
+.idea/modules.xml
+.idea/nd940-android-kotlin-c4-starter.iml
+.idea/vcs.xml
+.idea/caches/deviceStreaming.xml
+starter/local.defaults.properties
+starter/.idea/AndroidProjectSystem.xml
+starter/.idea/deploymentTargetSelector.xml
+starter/.idea/runConfigurations.xml
+starter/.idea/deviceManager.xml
