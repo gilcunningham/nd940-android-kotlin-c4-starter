@@ -39,6 +39,7 @@ fun Fragment.setDisplayHomeAsUpEnabled(bool: Boolean) {
  * Animate changing the view visibility.
  */
 fun View.fadeIn() {
+    println("*** $this fade In")
     this.visibility = View.VISIBLE
     this.alpha = 0f
     this.animate().alpha(1f).setListener(object : AnimatorListenerAdapter() {
@@ -52,6 +53,7 @@ fun View.fadeIn() {
  * Animate changing the view visibility.
  */
 fun View.fadeOut() {
+    println("*** $this fade out")
     this.animate().alpha(0f).setListener(object : AnimatorListenerAdapter() {
         override fun onAnimationEnd(animation: Animator) {
             this@fadeOut.alpha = 1f

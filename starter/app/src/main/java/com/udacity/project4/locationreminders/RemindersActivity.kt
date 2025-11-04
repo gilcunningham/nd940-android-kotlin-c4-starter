@@ -2,6 +2,7 @@ package com.udacity.project4.locationreminders
 
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import com.udacity.project4.databinding.ActivityRemindersBinding
@@ -17,6 +18,7 @@ class RemindersActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityRemindersBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setupBackNavigation()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -27,5 +29,12 @@ class RemindersActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun setupBackNavigation() {
+        onBackPressedDispatcher.addCallback {
+            // TODO: add prompt
+            finishAffinity()
+        }
     }
 }
