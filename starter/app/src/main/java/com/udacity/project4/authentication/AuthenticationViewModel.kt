@@ -1,17 +1,15 @@
 package com.udacity.project4.authentication
 
-import android.app.Activity
-import android.app.Fragment
 import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
-import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import com.firebase.ui.auth.AuthUI
-import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.udacity.project4.R
 
-class AuthenticationViewModel: ViewModel() {
+class AuthenticationViewModel : ViewModel() {
 
     enum class AuthenticationState {
         AUTHENTICATED, UNAUTHENTICATED, INVALID_AUTHENTICATION
@@ -30,14 +28,35 @@ class AuthenticationViewModel: ViewModel() {
                 )
             ).build()
     }
-
     private var signInFlowLaunched = false
+
+    private val _onLoginClicked = MutableLiveData(false)
+    val onLoginClicked: LiveData<Boolean> = _onLoginClicked
+
+    val isWelcomeTextVisible = MutableLiveData(true)
+    val isProgressBarVisible = MutableLiveData(true)
 
     val authenticationState = FirebaseUserLiveData().map { user ->
         if (user != null) {
-            signInFlowLaunched = false
+            println("*** welcome back ${user.email}")
+            //signInFlowLaunched = false
+            isWelcomeTextVisible.postValue(false)
+            isProgressBarVisible.postValue(true)
+
             AuthenticationState.AUTHENTICATED
+
+            // show progress bar
+
         } else {
+            println("*** auth state")
+            isWelcomeTextVisible.postValue(true)
+            isProgressBarVisible.postValue(false)
+
+
+            //welcomeTextVisibility.postValue(View.VISIBLE)
+            //doingWorkVisibility.postValue(View.GONE)
+            // hide progress bar
+
             if (signInFlowLaunched) {
                 AuthenticationState.INVALID_AUTHENTICATION
             } else {
@@ -48,6 +67,16 @@ class AuthenticationViewModel: ViewModel() {
 
     fun launchSignInFlow(loginLauncher: ActivityResultLauncher<Intent>) {
         loginLauncher.launch(firebaseLoginIntent)
+        onSignInFlowLaunched()
+    }
+
+    private fun onSignInFlowLaunched() {
         signInFlowLaunched = true
+        _onLoginClicked.value = false
+    }
+
+    fun loginClicked() {
+        println("*** on login click")
+        _onLoginClicked.value = true
     }
 }
