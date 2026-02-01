@@ -5,6 +5,8 @@ import androidx.databinding.BindingAdapter
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.udacity.project4.base.BaseRecyclerViewAdapter
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 
 object BindingAdapters {
 
@@ -35,12 +37,22 @@ object BindingAdapters {
         } else {
             view.animate().cancel()
             if (visible == true) {
-                if (view.visibility == View.GONE)
+                if (view.isGone)
                     view.fadeIn()
             } else {
-                if (view.visibility == View.VISIBLE)
+                if (view.isVisible)
                     view.fadeOut()
             }
+        }
+    }
+
+    @BindingAdapter("android:visibility")
+    @JvmStatic
+    fun setVisible(view: View, visible: LiveData<Boolean>) {
+        view.visibility = if (visible.value == true) {
+            View.VISIBLE
+        } else {
+            View.GONE
         }
     }
 }
