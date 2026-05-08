@@ -1,6 +1,5 @@
 package com.udacity.project4.locationreminders.savereminder.selectreminderlocation
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -37,7 +36,7 @@ class SelectLocationFragment : BaseFragment() {
         //setHasOptionsMenu(true)
         setDisplayHomeAsUpEnabled(true)
         // TODO: add the map setup implementation
-        setupGoogleMap()
+        observeOnMapReady()
 
         // TODO: zoom to the user location after taking his permission
         // TODO: add style to the map
@@ -50,13 +49,14 @@ class SelectLocationFragment : BaseFragment() {
         locationViewModel.onResumePermissionFlow(this)
     }
 
-    private fun setupGoogleMap() {
+    private fun observeOnMapReady() {
         println("*** setup google maps")
         locationViewModel.onMapReady.observe(viewLifecycleOwner) { isMapReady ->
             if (isMapReady) {
                 locationViewModel.enableMyLocation(this@SelectLocationFragment)
             }
         }
+        // can move this
         mapFragment.getMapAsync(locationViewModel)
     }
 
