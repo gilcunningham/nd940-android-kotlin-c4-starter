@@ -24,6 +24,7 @@ import com.udacity.project4.utils.LocationPermissionUtils.requestLocationPermiss
 import com.udacity.project4.utils.LocationPermissionUtils.shouldShowRequestPermissionRationale
 
 import com.udacity.project4.utils.SingleLiveEvent
+import timber.log.Timber
 
 class SelectLocationViewModel : ViewModel(), OnMapReadyCallback {
 
@@ -54,7 +55,7 @@ class SelectLocationViewModel : ViewModel(), OnMapReadyCallback {
     private fun getLastKnownLatLng() = LatLng(lastKnownLat, lastKnownLng)
 
     override fun onMapReady(googleMap: GoogleMap) {
-        println("*** onMapReady")
+        Timber.d("mapReady")
         this.googleMap = googleMap
         onMapReady.value = true
     }
@@ -71,10 +72,9 @@ class SelectLocationViewModel : ViewModel(), OnMapReadyCallback {
             return
         }
         val context = fragment.requireContext()
-        val activity = fragment.requireActivity()
         // device location denied
         if (wasDeviceLocationDenied(context)) {
-            activity.finish()
+            fragment.requireActivity().finish()
             return
         }
         // location permission denied
@@ -85,11 +85,6 @@ class SelectLocationViewModel : ViewModel(), OnMapReadyCallback {
         enableMyLocation(fragment)
     }
 
-    private fun wasLocationPermissionDenied(context: Context) =
-        permissionRequestShown && !areLocationServicesSetup(context)
-
-    private fun wasDeviceLocationDenied(context: Context) =
-        locationRationaleShown && !isDeviceLocationEnabled(context)
 
     @SuppressLint("MissingPermission")
     fun enableMyLocation(fragment: Fragment) {
@@ -99,7 +94,8 @@ class SelectLocationViewModel : ViewModel(), OnMapReadyCallback {
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
             googleMap.isMyLocationEnabled = true
             googleMap.zoomMyLocation()
-            //TODO - add map callbacks
+            googleMap.setupForUserInteraction()
+            //TODO - add other map callbacks ?
             return
         }
         // device location
@@ -115,15 +111,34 @@ class SelectLocationViewModel : ViewModel(), OnMapReadyCallback {
         if (!locationRationaleShown &&
             shouldShowRequestPermissionRationale(fragment.requireActivity())
         ) {
-            LocationRationaleDialog.newInstance(onRequestLocationPermissionListener)
-                .show(fragment.childFragmentManager, "location rationale dialog")
+            LocationRationaleDialog.newInstance(
+                onRequestLocationPermissionListener
+            ).show(
+                fragment.childFragmentManager,
+                "location rationale dialog"
+            )
             locationRationaleShown = true
             return
         }
         // request location permissions
         if (!permissionRequestShown) {
             permissionRequestShown = true
-            requestLocationPermission(fragment.requireActivity(), LOCATION_PERMISSION_REQUEST_CODE)
+            requestLocationPermission(
+                fragment.requireActivity(),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
+        }
+    }
+
+    private fun wasDeviceLocationDenied(context: Context) =
+        locationRationaleShown && !isDeviceLocationEnabled(context)
+
+    private fun wasLocationPermissionDenied(context: Context) =
+        permissionRequestShown && !areLocationServicesSetup(context)
+
+    fun GoogleMap.setupForUserInteraction() {
+        setOnMapClickListener { latLng ->
+            println("*** onCLick $latLng")
         }
     }
 
@@ -146,12 +161,16 @@ class SelectLocationViewModel : ViewModel(), OnMapReadyCallback {
     fun GoogleMap.zoomLastKnownLocation() {
         val coordinate = LatLng(lastKnownLat, lastKnownLng)
         val zoomLocation = CameraUpdateFactory.newLatLngZoom(coordinate, ZOOM_LEVEL)
-        animateCamera(zoomLocation, ZOOM_DURATION, object : CancelableCallback {
-            override fun onCancel() {}
-            override fun onFinish() {
-                //TODO - add marker ?
+        animateCamera(
+            zoomLocation,
+            ZOOM_DURATION,
+            object : CancelableCallback {
+                override fun onCancel() {}
+                override fun onFinish() {
+                    //TODO - add marker ?
+                }
             }
-        })
+        )
     }
 
     private companion object {
